@@ -1,15 +1,21 @@
-const Page = require("./RegistrationPage");
+const Page = require("../pages/Registration");
 const {Builder} = require('selenium-webdriver');
 const assert = require('assert');
 
-
 describe('Registration flow test', function() {
-  it('should register new user', async function() {
-    this.timeout(0);
-    let driver = await new Builder().forBrowser('chrome').build();
-    const page = new Page(driver);
+  this.timeout(60000);
+  let driver;
+  let page;
 
-    try {
+  before(async function() {
+    driver = await new Builder().forBrowser('chrome').build();
+    page = new Page(driver);
+  });
+
+  after(async function() {
+    return driver.close();
+  });
+  it('should register new user (Test Case 1)', async function() {
       await page.load();
       await page.enterEmail('diana.semenova.dev@gmail.com');
       await page.enterLastName('Семенова');
@@ -24,10 +30,6 @@ describe('Registration flow test', function() {
       await page.verifyCaptcha();
       await page.goNext();
       const isRegSuccessful = await page.isRegistrationSuccessful();
-      return assert.equal(isRegSuccessful, true, 'Successful registration message is shown')
-    } finally {
-      await driver.quit();
-    }
-    return false;
+      return assert.equal(isRegSuccessful, true, 'Successful registration message is shown');
   });
 });
